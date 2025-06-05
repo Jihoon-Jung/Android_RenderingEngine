@@ -14,7 +14,7 @@ public:
 
     void Update();
     void SetPosition(const Eigen::Vector3f& pos) { _position = pos; }
-    void SetRotationEuler(const Eigen::Vector3f& eulerDeg); // 외부에서는 오일러로 설정
+    void RotateByEulerDelta(float pitchDeg, float yawDeg);
     void SetScale(const Eigen::Vector3f& s) { _scale = s; }
 
     const Eigen::Matrix4f& GetModelMatrix() const { return _model; }

@@ -30,7 +30,11 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         EGLRenderer.cpp
         Shaders.h
         Shaders.cpp
-        Interface.h)
+        Interface.h
+        Camera.cpp
+        Geometry.cpp
+        RenderObject.cpp
+        Transform.cpp)
 
 # 1. Assimp 소스 디렉토리 지정
 set(ASSIMP_SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../external/assimp)

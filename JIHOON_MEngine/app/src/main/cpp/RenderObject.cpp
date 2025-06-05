@@ -6,4 +6,11 @@
 RenderObject::RenderObject() {
     _transform = make_shared<Transform>();
     _geometry = make_shared<Geometry>();
+
+    _geometry->CreateCube_Geometry();
+}
+
+void RenderObject::Update() {
+    _transform->Update();
+
 }

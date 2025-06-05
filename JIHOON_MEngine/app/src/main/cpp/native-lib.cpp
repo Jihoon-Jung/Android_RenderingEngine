@@ -31,3 +31,10 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_example_jihoon_1mengine_MainActivity_nativeOnSurfaceChanged(JNIEnv *env, jobject thiz, jint width, jint height) {
     renderer.setViewportSize(width, height);
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_jihoon_1mengine_MainActivity_nativeOnTouchDelta(JNIEnv *env, jobject thiz, jfloat dx, jfloat dy) {
+    LOGE("dx : %f, dy : %f\n", dx, dy);
+    renderer.onTouchDelta(dx, dy); // 회전 입력 전달
+}

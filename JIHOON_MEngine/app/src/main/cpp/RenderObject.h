@@ -6,6 +6,8 @@
 #define JIHOON_MENGINE_RENDEROBJECT_H
 
 #include "Interface.h"
+#include "Transform.h"
+#include "Geometry.h"
 
 class RenderObject {
 public:
@@ -13,7 +15,10 @@ public:
     ~RenderObject() {};
 
     void Update();
+    void rotateByEulerDelta(float pitch, float yaw);
 
+    shared_ptr<Transform>& GetTransform() { return _transform; }
+    shared_ptr<Geometry>& GetGeometry() { return _geometry; }
 private:
     shared_ptr<Transform> _transform;
     shared_ptr<Geometry> _geometry;
