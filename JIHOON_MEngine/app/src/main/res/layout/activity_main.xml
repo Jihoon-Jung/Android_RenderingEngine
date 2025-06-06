@@ -22,11 +22,10 @@
         android:id="@+id/buttonSelectImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:text="Select Image"
-        tools:layout_editor_absoluteX="30dp"
-        tools:layout_editor_absoluteY="537dp"
-        tools:ignore="MissingConstraints" />
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/surfaceView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

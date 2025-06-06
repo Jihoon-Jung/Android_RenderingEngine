@@ -23,7 +23,7 @@ public:
     void onTouchDelta(float dx, float dy);
 
     void setImageData(int width, int height, void* pixelData);
-
+    void setImageData2(int width, int height, void* pixelData);
 private:
     EGLDisplay _display; // OpenglES 명령을 보낼 수 있는 "물리적 출력 장치"에 대한 핸들, HDMI포트 같은 느낌이다.
     EGLSurface _surface; // 실제 픽셀을 렌더링할 대상 (보통 화면 Surface), GPU가 렌더링한 결과를 출력하는 버퍼
@@ -42,6 +42,10 @@ private:
     shared_ptr<Camera> _camera;
 
     unsigned int _textureId;
+
+    std::vector<unsigned char> _pendingImageData;
+    int _pendingWidth = 0, _pendingHeight = 0;
+    bool _hasPendingImage = false;
 };
 
 

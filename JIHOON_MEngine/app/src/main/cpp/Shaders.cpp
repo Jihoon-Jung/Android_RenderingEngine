@@ -12,17 +12,29 @@ struct ShaderSet {
 
 const char *SimpleVertexShaderSource = R"(#version 300 es
 layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 aUv;
 uniform mat4 uMVP;
+
+out vec2 vUv;
+
 void main() {
+    vUv = aUv;
     gl_Position = uMVP * vec4(aPos, 1.0);
 }
 )";
 
 const char *SimpleRedFragmentShaderSource = R"(#version 300 es
 precision mediump float;
+in vec2 vUv;
 out vec4 FragColor;
+
+uniform sampler2D uTexture;
+
 void main() {
-    FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    // 텍스처 샘플링
+    vec4 texColor = texture(uTexture, vUv);
+
+    FragColor = vec4(texColor.rgb, 1.0);
 }
 )";
 

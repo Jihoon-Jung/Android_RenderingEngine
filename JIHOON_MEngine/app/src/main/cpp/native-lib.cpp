@@ -43,22 +43,27 @@ Java_com_example_jihoon_1mengine_MainActivity_nativeOnTouchDelta(JNIEnv *env, jo
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_jihoon_1mengine_MainActivity_nativeSetImage(JNIEnv *env, jobject thiz, jobject bitmap) {
-//    AndroidBitmapInfo info;
-//    void* pixels = nullptr;
-//
-//    if (AndroidBitmap_getInfo(env, bitmap, &info) != ANDROID_BITMAP_RESULT_SUCCESS ||
-//        info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-//        LOGE("Unsupported bitmap format");
-//        return;
-//    }
-//
-//    if (AndroidBitmap_lockPixels(env, bitmap, &pixels) != ANDROID_BITMAP_RESULT_SUCCESS) {
-//        LOGE("Failed to lock pixels");
-//        return;
-//    }
-//
-//    // renderer에 이미지 데이터 전달
-//    renderer.setImageData(info.width, info.height, pixels);
-//
-//    AndroidBitmap_unlockPixels(env, bitmap);
+    AndroidBitmapInfo info;
+    void* pixels = nullptr;
+
+    if (AndroidBitmap_getInfo(env, bitmap, &info) != ANDROID_BITMAP_RESULT_SUCCESS ||
+        info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
+        LOGE("Unsupported bitmap format");
+        return;
+    }
+
+    if (AndroidBitmap_lockPixels(env, bitmap, &pixels) != ANDROID_BITMAP_RESULT_SUCCESS) {
+        LOGE("Failed to lock pixels");
+        return;
+    }
+
+    // renderer에 이미지 데이터 전달
+    renderer.setImageData(info.width, info.height, pixels);
+    LOGE("JNI info.width : %d, info.height : %d", info.width, info.height);
+    AndroidBitmap_unlockPixels(env, bitmap);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jihoon_1mengine_MainActivity_nativeRelease(JNIEnv* env, jobject thiz) {
+    renderer.cleanup();
 }

@@ -60,7 +60,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {}
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                Log.d("JJH", "surfaceDestroyed");
+                nativeRelease();
+            }
         });
 
         surfaceView.setOnTouchListener(new View.OnTouchListener() {
@@ -132,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
      * which is packaged with this application.
      */
     private native boolean nativeInit(Surface surface);
+    private native void nativeRelease();
     private native void nativeRender();
     private native void nativeOnSurfaceChanged(int width, int height);
 

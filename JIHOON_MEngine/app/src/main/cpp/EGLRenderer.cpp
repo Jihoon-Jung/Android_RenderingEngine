@@ -85,7 +85,6 @@ bool EGLRenderer::initialize(EGLNativeWindowType window) {
     _camera->initialize(ANativeWindow_getWidth(window),ANativeWindow_getHeight(window));
 
     _renderObject = make_shared<RenderObject>();
-
     return true;
 }
 
@@ -111,7 +110,35 @@ void EGLRenderer::cleanup() {
 
 
 void EGLRenderer::renderFrame() {
-    LOGI("EGLRenderer renderFrame");
+
+    if (_display == EGL_NO_DISPLAY || _surface == EGL_NO_SURFACE || _context == EGL_NO_CONTEXT) {
+        LOGE("EGL not initialized or surface/context lost");
+        return;
+    }
+
+    if (_hasPendingImage) {
+        // 텍스처 생성 코드
+        if (_textureId == 0)
+            glGenTextures(1, &_textureId);
+        glBindTexture(GL_TEXTURE_2D, _textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _pendingWidth, _pendingHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, _pendingImageData.data());
+        GLenum err = glGetError();
+        if (err != GL_NO_ERROR) {
+            LOGE("OpenGL error after glTexImage2D: 0x%x", err);
+        } else {
+            LOGE("Texture uploaded successfully: id=%u, size=%dx%d", _textureId, _pendingWidth, _pendingHeight);
+        }
+        _hasPendingImage = false;
+    }
+    if (_textureId == 0) {
+        LOGE("No texture available for rendering");
+        return;
+    }
+
     _camera->Update();
     _renderObject->Update();
 
@@ -124,14 +151,42 @@ void EGLRenderer::renderFrame() {
     Eigen::Matrix4f mvp = _camera->GetProjectionViewMat() * _renderObject->GetTransform()->GetModelMatrix();
 
     glUseProgram(shaderProgram);
+
+    // 1. uMVP 설정
     GLint mvpLoc = glGetUniformLocation(shaderProgram, "uMVP");
     glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, mvp.data());
 
-    glBindVertexArray(_renderObject->GetGeometry()->GetVAO());
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); // 36은 큐브의 인덱스 개수 (12 삼각형 * 3 정점)
+    // 텍스처 바인딩 전 에러 체크
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        LOGE("OpenGL error before texture binding: 0x%x", err);
+    }
 
-    eglSwapBuffers(_display, _surface);
+    // 텍스처 바인딩
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+
+    // 텍스처 바인딩 후 에러 체크
+    err = glGetError();
+    if (err != GL_NO_ERROR) {
+        LOGE("OpenGL error after texture binding: 0x%x", err);
+    }
+
+    GLint texLoc = glGetUniformLocation(shaderProgram, "uTexture");
+    if (texLoc == -1) {
+        LOGE("Failed to get uniform location for uTexture");
+    }
+    glUniform1i(texLoc, 0);
+
+    // 5. 정점 배열 및 드로우 호출
+    glBindVertexArray(_renderObject->GetGeometry()->GetVAO());
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+    if (!eglSwapBuffers(_display, _surface)) {
+        LOGE("eglSwapBuffers failed: 0x%x", eglGetError());
+    }
 }
+
 
 void EGLRenderer::setViewportSize(int width, int height) {
     LOGI("EGLRenderer setViewportSize");
@@ -153,14 +208,8 @@ void EGLRenderer::onTouchDelta(float dx, float dy) {
 }
 
 void EGLRenderer::setImageData(int width, int height, void *pixelData) {
-    if (_textureId == 0)
-        glGenTextures(1, &_textureId);
-
-    glBindTexture(GL_TEXTURE_2D, _textureId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    LOGE("Texture uploaded to GPU: id = %u", _textureId);
+    _pendingImageData.assign((unsigned char*)pixelData, (unsigned char*)pixelData + width * height * 4);
+    _pendingWidth = width;
+    _pendingHeight = height;
+    _hasPendingImage = true;
 }
