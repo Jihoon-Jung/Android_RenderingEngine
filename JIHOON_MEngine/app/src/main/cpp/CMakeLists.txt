@@ -34,7 +34,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         Camera.cpp
         Geometry.cpp
         RenderObject.cpp
-        Transform.cpp)
+        Transform.cpp
+        Texture.cpp)
 
 # 1. Assimp 소스 디렉토리 지정
 set(ASSIMP_SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../external/assimp)

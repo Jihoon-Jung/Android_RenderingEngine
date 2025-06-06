@@ -151,3 +151,16 @@ void EGLRenderer::onTouchDelta(float dx, float dy) {
         _renderObject->GetTransform()->RotateByEulerDelta(pitch, yaw);
     }
 }
+
+void EGLRenderer::setImageData(int width, int height, void *pixelData) {
+    if (_textureId == 0)
+        glGenTextures(1, &_textureId);
+
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    LOGE("Texture uploaded to GPU: id = %u", _textureId);
+}

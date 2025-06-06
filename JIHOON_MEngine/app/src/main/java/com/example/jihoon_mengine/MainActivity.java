@@ -2,7 +2,11 @@ package com.example.jihoon_mengine;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Choreographer;
 import android.view.MotionEvent;
@@ -13,6 +17,8 @@ import android.view.View;
 
 import com.example.jihoon_mengine.databinding.ActivityMainBinding;
 
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'jihoon_mengine' library on application startup.
@@ -21,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ActivityMainBinding binding;
+
+    private static final int REQUEST_PICK_IMAGE = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +93,16 @@ public class MainActivity extends AppCompatActivity {
                 return true; // 이벤트 소비
             }
         });
+
+        binding.buttonSelectImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                startActivityForResult(intent, REQUEST_PICK_IMAGE);
+            }
+        });
+
     }
 
     private final Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
@@ -94,6 +112,21 @@ public class MainActivity extends AppCompatActivity {
             Choreographer.getInstance().postFrameCallback(this); // 다음 프레임에도 다시 호출
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_PICK_IMAGE && resultCode == RESULT_OK) {
+            Uri imageUri = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                nativeSetImage(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     /**
      * A native method that is implemented by the 'jihoon_mengine' native library,
      * which is packaged with this application.
@@ -103,4 +136,6 @@ public class MainActivity extends AppCompatActivity {
     private native void nativeOnSurfaceChanged(int width, int height);
 
     private native void nativeOnTouchDelta(float dx, float dy);
+
+    private native void nativeSetImage(Bitmap bitmap);
 }

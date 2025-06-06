@@ -3,6 +3,7 @@
 #include <android/native_window_jni.h> // ANativeWindow_fromSurface
 #include "EGLRenderer.h"
 #include "Shaders.h"
+#include <android/bitmap.h>
 
 static EGLRenderer renderer;
 extern "C" JNIEXPORT jstring JNICALL
@@ -37,4 +38,27 @@ JNIEXPORT void JNICALL
 Java_com_example_jihoon_1mengine_MainActivity_nativeOnTouchDelta(JNIEnv *env, jobject thiz, jfloat dx, jfloat dy) {
     LOGE("dx : %f, dy : %f\n", dx, dy);
     renderer.onTouchDelta(dx, dy); // 회전 입력 전달
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_jihoon_1mengine_MainActivity_nativeSetImage(JNIEnv *env, jobject thiz, jobject bitmap) {
+//    AndroidBitmapInfo info;
+//    void* pixels = nullptr;
+//
+//    if (AndroidBitmap_getInfo(env, bitmap, &info) != ANDROID_BITMAP_RESULT_SUCCESS ||
+//        info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
+//        LOGE("Unsupported bitmap format");
+//        return;
+//    }
+//
+//    if (AndroidBitmap_lockPixels(env, bitmap, &pixels) != ANDROID_BITMAP_RESULT_SUCCESS) {
+//        LOGE("Failed to lock pixels");
+//        return;
+//    }
+//
+//    // renderer에 이미지 데이터 전달
+//    renderer.setImageData(info.width, info.height, pixels);
+//
+//    AndroidBitmap_unlockPixels(env, bitmap);
 }
