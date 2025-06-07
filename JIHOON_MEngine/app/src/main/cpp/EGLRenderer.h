@@ -10,6 +10,7 @@
 #include "Shaders.h"
 #include "RenderObject.h"
 #include "Camera.h"
+#include "Scene.h"
 
 class EGLRenderer {
 public:
@@ -21,9 +22,8 @@ public:
     void cleanup();
     void setViewportSize(int width, int height);
     void onTouchDelta(float dx, float dy);
-
-    void setImageData(int width, int height, void* pixelData);
-    void setImageData2(int width, int height, void* pixelData);
+    void resetScene();
+    shared_ptr<Scene>& getScene() { return _scene; }
 private:
     EGLDisplay _display; // OpenglES 명령을 보낼 수 있는 "물리적 출력 장치"에 대한 핸들, HDMI포트 같은 느낌이다.
     EGLSurface _surface; // 실제 픽셀을 렌더링할 대상 (보통 화면 Surface), GPU가 렌더링한 결과를 출력하는 버퍼
@@ -32,20 +32,14 @@ private:
     // GL 함수를 호출하면 context 내 자원에 작용함
     // 한 쓰레드당 하나의 context만 current 상태가 될 수 있음
 
-    shared_ptr<Shaders> shaders;
 
     int _surfaceWidth;
     int _surfaceHeight;
 
-
-    shared_ptr<RenderObject> _renderObject;
+    shared_ptr<Shaders> shaders;
     shared_ptr<Camera> _camera;
+    shared_ptr<Scene> _scene;
 
-    unsigned int _textureId;
-
-    std::vector<unsigned char> _pendingImageData;
-    int _pendingWidth = 0, _pendingHeight = 0;
-    bool _hasPendingImage = false;
 };
 
 

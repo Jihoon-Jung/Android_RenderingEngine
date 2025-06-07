@@ -97,7 +97,7 @@ bool Shaders::CreateShaderProgram() {
         glDeleteShader(fragmentShader);
 
         shaderMap[shader.name] = shaderProgram;
-
+        LOGI("Shader Compile finish and add shaderProgram : %d", shaderProgram);
     }
 
     return true;

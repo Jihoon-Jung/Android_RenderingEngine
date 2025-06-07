@@ -1,9 +1,10 @@
 package com.example.jihoon_mengine;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -11,17 +12,17 @@ import android.util.Log;
 import android.view.Choreographer;
 import android.view.MotionEvent;
 import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
+import android.widget.*;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jihoon_mengine.databinding.ActivityMainBinding;
 
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-
-    // Used to load the 'jihoon_mengine' library on application startup.
     static {
         System.loadLibrary("jihoon_mengine");
     }
@@ -29,6 +30,18 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     private static final int REQUEST_PICK_IMAGE = 1001;
+    private static final int REQUEST_PICK_TEXTURE = 2001;
+
+    // Scene Edit 관련 변수
+    private LinearLayout layoutMain;
+    private View layoutSceneEdit;
+    private Button buttonSelectMesh, buttonSelectTexture, buttonOk, buttonCancel;
+    private String selectedMesh = null;
+    private Bitmap selectedTexture = null;
+
+    private final String[] meshList = {"Sphere", "Cube", "Pyramid"};
+
+    private TextureView textureView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,82 +50,111 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        SurfaceView surfaceView = findViewById(R.id.surfaceView);
-
-        surfaceView.setFocusable(true);
-        surfaceView.setFocusableInTouchMode(true);
-        surfaceView.requestFocus(); // 포커스 강제 요청
-        surfaceView.setClickable(true); // 클릭 가능하도록 설정
-
-        SurfaceHolder holder = surfaceView.getHolder();
-        holder.addCallback(new SurfaceHolder.Callback() {
+        // TextureView 연결
+        textureView = findViewById(R.id.textureView);
+        textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
             @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                if (nativeInit(holder.getSurface()))
+            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                Surface s = new Surface(surface);
+                if (nativeInit(s))
                     Choreographer.getInstance().postFrameCallback(frameCallback);
                 else
-                    Log.d("ERROR", "EGL Initialize Error");
+                    Log.e("JJH", "EGL Initialize Error");
             }
 
             @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                nativeOnSurfaceChanged(width, height); // JNI 호출
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+                nativeOnSurfaceChanged(width, height);
             }
 
             @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                Log.d("JJH", "surfaceDestroyed");
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
                 nativeRelease();
+                return true;
             }
+
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surface) {}
         });
 
-        surfaceView.setOnTouchListener(new View.OnTouchListener() {
-            float prevX = 0;
-            float prevY = 0;
-
+        textureView.setOnTouchListener(new View.OnTouchListener() {
+            float prevX = 0, prevY = 0;
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 float x = event.getX();
                 float y = event.getY();
-
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        prevX = x;
-                        prevY = y;
-                        break;
-
+                        prevX = x; prevY = y; break;
                     case MotionEvent.ACTION_MOVE:
-                        float dx = x - prevX;
-                        float dy = y - prevY;
-
-                        Log.d("JJH", "touch delta x : " + dx + " delta y : " + dy);
-                        // 화면 해상도 비례로 정규화된 delta 회전값 전달
+                        float dx = x - prevX, dy = y - prevY;
                         nativeOnTouchDelta(dx, dy);
-
-                        prevX = x;
-                        prevY = y;
-                        break;
+                        prevX = x; prevY = y; break;
                 }
-                return true; // 이벤트 소비
+                return true;
             }
         });
 
-        binding.buttonSelectImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                startActivityForResult(intent, REQUEST_PICK_IMAGE);
-            }
+        // View 연결
+        layoutMain = findViewById(R.id.layoutMain);
+        layoutSceneEdit = findViewById(R.id.layoutSceneEdit);
+
+        // "Make_Scene" 버튼
+        findViewById(R.id.buttonMakeScene).setOnClickListener(v -> {
+            nativeResetScene();
+            selectedMesh = null;
+            selectedTexture = null;
+            buttonSelectMesh.setText("메쉬 선택");
+            checkOkButton();
+            layoutMain.setVisibility(View.GONE);
+            layoutSceneEdit.setVisibility(View.VISIBLE);
         });
 
+        // Scene 생성 화면 UI
+        buttonSelectMesh = findViewById(R.id.buttonSelectMesh);
+        buttonSelectMesh.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("메쉬 선택");
+            builder.setItems(meshList, (dialog, which) -> {
+                selectedMesh = meshList[which];
+                buttonSelectMesh.setText("메쉬: " + selectedMesh);
+                nativeSetMeshType(selectedMesh);
+                Log.d("JJH", "call nativeSetMeshType -> meshType : " + selectedMesh);
+                checkOkButton();
+            });
+            builder.show();
+        });
+
+        buttonSelectTexture = findViewById(R.id.buttonSelectTexture);
+        buttonSelectTexture.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_PICK_TEXTURE);
+        });
+
+        buttonOk = findViewById(R.id.buttonOk);
+        buttonOk.setOnClickListener(v -> {
+            layoutSceneEdit.setVisibility(View.GONE);
+            layoutMain.setVisibility(View.VISIBLE);
+        });
+
+        buttonCancel = findViewById(R.id.buttonCancel);
+        buttonCancel.setOnClickListener(v -> {
+            layoutSceneEdit.setVisibility(View.GONE);
+            layoutMain.setVisibility(View.VISIBLE);
+        });
+    }
+
+    private void checkOkButton() {
+        if (buttonOk != null)
+            buttonOk.setEnabled(selectedMesh != null && selectedTexture != null);
     }
 
     private final Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
         @Override
         public void doFrame(long frameTimeNanos) {
             nativeRender();
-            Choreographer.getInstance().postFrameCallback(this); // 다음 프레임에도 다시 호출
+            Choreographer.getInstance().postFrameCallback(this);
         }
     };
 
@@ -120,26 +162,35 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_PICK_IMAGE && resultCode == RESULT_OK) {
+        if ((requestCode == REQUEST_PICK_IMAGE || requestCode == REQUEST_PICK_TEXTURE)
+                && resultCode == RESULT_OK) {
             Uri imageUri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+                // Scene 생성 UI에서의 텍스처 선택인 경우
+                if (requestCode == REQUEST_PICK_TEXTURE) {
+                    selectedTexture = bitmap;
+                    checkOkButton();
+                }
+
+                // 모든 경우에 nativeSetImage 호출
                 nativeSetImage(bitmap);
+                Log.d("JJH", "call nativeSetImage");
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-    /**
-     * A native method that is implemented by the 'jihoon_mengine' native library,
-     * which is packaged with this application.
-     */
+
+    // JNI 함수 선언
     private native boolean nativeInit(Surface surface);
     private native void nativeRelease();
     private native void nativeRender();
     private native void nativeOnSurfaceChanged(int width, int height);
-
     private native void nativeOnTouchDelta(float dx, float dy);
-
     private native void nativeSetImage(Bitmap bitmap);
+    private native void nativeSetMeshType(String meshType);
+    private native void nativeResetScene();
 }

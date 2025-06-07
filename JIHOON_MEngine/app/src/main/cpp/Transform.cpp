@@ -14,15 +14,6 @@ void Transform::RotateByEulerDelta(float pitchDeg, float yawDeg) {
             Eigen::AngleAxisf(pitchRad, Eigen::Vector3f::UnitX());
 
     _rotation = deltaRot * _rotation;  // 누적 회전
-
-//    Eigen::Matrix3f rotMat = _rotation.toRotationMatrix();
-//    LOGE("Rotation Matrix:\n"
-//         "[%f, %f, %f]\n"
-//         "[%f, %f, %f]\n"
-//         "[%f, %f, %f]\n",
-//         rotMat(0, 0), rotMat(0, 1), rotMat(0, 2),
-//         rotMat(1, 0), rotMat(1, 1), rotMat(1, 2),
-//         rotMat(2, 0), rotMat(2, 1), rotMat(2, 2));
 }
 
 void Transform::UpdateModelMatrix() {
@@ -32,16 +23,6 @@ void Transform::UpdateModelMatrix() {
     t.scale(_scale);
 
     _model = t.matrix();  // 최종 4x4 행렬
-
-//    LOGE("Model Matrix:\n"
-//         "[%f, %f, %f, %f]\n"
-//         "[%f, %f, %f, %f]\n"
-//         "[%f, %f, %f, %f]\n"
-//         "[%f, %f, %f, %f]\n",
-//         _model(0, 0), _model(0, 1), _model(0, 2), _model(0, 3),
-//         _model(1, 0), _model(1, 1), _model(1, 2), _model(1, 3),
-//         _model(2, 0), _model(2, 1), _model(2, 2), _model(2, 3),
-//         _model(3, 0), _model(3, 1), _model(3, 2), _model(3, 3));
 }
 
 void Transform::Update() {

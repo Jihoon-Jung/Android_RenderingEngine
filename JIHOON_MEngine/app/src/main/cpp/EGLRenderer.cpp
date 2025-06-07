@@ -84,7 +84,8 @@ bool EGLRenderer::initialize(EGLNativeWindowType window) {
     _camera = make_shared<Camera>();
     _camera->initialize(ANativeWindow_getWidth(window),ANativeWindow_getHeight(window));
 
-    _renderObject = make_shared<RenderObject>();
+    _scene =  make_shared<Scene>();
+
     return true;
 }
 
@@ -116,75 +117,56 @@ void EGLRenderer::renderFrame() {
         return;
     }
 
-    if (_hasPendingImage) {
-        // 텍스처 생성 코드
-        if (_textureId == 0)
-            glGenTextures(1, &_textureId);
-        glBindTexture(GL_TEXTURE_2D, _textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _pendingWidth, _pendingHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, _pendingImageData.data());
-        GLenum err = glGetError();
-        if (err != GL_NO_ERROR) {
-            LOGE("OpenGL error after glTexImage2D: 0x%x", err);
-        } else {
-            LOGE("Texture uploaded successfully: id=%u, size=%dx%d", _textureId, _pendingWidth, _pendingHeight);
-        }
-        _hasPendingImage = false;
-    }
-    if (_textureId == 0) {
-        LOGE("No texture available for rendering");
+    unsigned int textureId = 0;
+    shared_ptr<RenderObject> renderObj = _scene->getRenderObject();
+    shared_ptr<Texture> texture = _scene->getRenderObject()->GetTexture();
+
+    textureId = _scene->getRenderObject()->GetTexture()->getTextureId();
+    if (textureId == 0) {
         return;
     }
 
     _camera->Update();
-    _renderObject->Update();
+    renderObj = _scene->getRenderObject();
+    renderObj->Update();
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-
+    CHECK_GL_ERROR();
     unsigned int shaderProgram = shaders->GetShaderProgram("SimpleRed");
 
-    Eigen::Matrix4f mvp = _camera->GetProjectionViewMat() * _renderObject->GetTransform()->GetModelMatrix();
+    Eigen::Matrix4f mvp = _camera->GetProjectionViewMat() * renderObj->GetTransform()->GetModelMatrix();
 
     glUseProgram(shaderProgram);
-
+    CHECK_GL_ERROR();
     // 1. uMVP 설정
     GLint mvpLoc = glGetUniformLocation(shaderProgram, "uMVP");
     glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, mvp.data());
-
-    // 텍스처 바인딩 전 에러 체크
-    GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {
-        LOGE("OpenGL error before texture binding: 0x%x", err);
-    }
+    CHECK_GL_ERROR();
 
     // 텍스처 바인딩
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _textureId);
-
-    // 텍스처 바인딩 후 에러 체크
-    err = glGetError();
-    if (err != GL_NO_ERROR) {
-        LOGE("OpenGL error after texture binding: 0x%x", err);
-    }
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    CHECK_GL_ERROR();
 
     GLint texLoc = glGetUniformLocation(shaderProgram, "uTexture");
     if (texLoc == -1) {
         LOGE("Failed to get uniform location for uTexture");
     }
     glUniform1i(texLoc, 0);
+    CHECK_GL_ERROR();
 
     // 5. 정점 배열 및 드로우 호출
-    glBindVertexArray(_renderObject->GetGeometry()->GetVAO());
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(renderObj->GetGeometry()->getVAO());
+    CHECK_GL_ERROR();
+    glDrawElements(GL_TRIANGLES, renderObj->GetGeometry()->getIndexCount(), GL_UNSIGNED_INT, 0);
+    CHECK_GL_ERROR();
 
     if (!eglSwapBuffers(_display, _surface)) {
         LOGE("eglSwapBuffers failed: 0x%x", eglGetError());
     }
+    CHECK_GL_ERROR();
 }
 
 
@@ -197,19 +179,17 @@ void EGLRenderer::setViewportSize(int width, int height) {
 }
 
 void EGLRenderer::onTouchDelta(float dx, float dy) {
-    if (_renderObject)
+    if (_scene->getRenderObject())
     {
         float sensitivity = 0.5f;
         float yaw = dx * sensitivity;
         float pitch = dy * sensitivity;
-        LOGE(" yaw : %f, pitch : %f\n", dy, dx);
-        _renderObject->GetTransform()->RotateByEulerDelta(pitch, yaw);
+        _scene->getRenderObject()->GetTransform()->RotateByEulerDelta(pitch, yaw);
     }
 }
 
-void EGLRenderer::setImageData(int width, int height, void *pixelData) {
-    _pendingImageData.assign((unsigned char*)pixelData, (unsigned char*)pixelData + width * height * 4);
-    _pendingWidth = width;
-    _pendingHeight = height;
-    _hasPendingImage = true;
+void EGLRenderer::resetScene() {
+    LOGI("EGLRenderer -> resetScene()");
+    _scene.reset();
+    _scene = make_shared<Scene>();
 }

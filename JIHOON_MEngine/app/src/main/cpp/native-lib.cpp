@@ -36,7 +36,6 @@ Java_com_example_jihoon_1mengine_MainActivity_nativeOnSurfaceChanged(JNIEnv *env
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_jihoon_1mengine_MainActivity_nativeOnTouchDelta(JNIEnv *env, jobject thiz, jfloat dx, jfloat dy) {
-    LOGE("dx : %f, dy : %f\n", dx, dy);
     renderer.onTouchDelta(dx, dy); // 회전 입력 전달
 }
 
@@ -58,12 +57,25 @@ Java_com_example_jihoon_1mengine_MainActivity_nativeSetImage(JNIEnv *env, jobjec
     }
 
     // renderer에 이미지 데이터 전달
-    renderer.setImageData(info.width, info.height, pixels);
-    LOGE("JNI info.width : %d, info.height : %d", info.width, info.height);
+    renderer.getScene()->setTextureToRenderObject(info.width, info.height, pixels);
     AndroidBitmap_unlockPixels(env, bitmap);
 }
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_example_jihoon_1mengine_MainActivity_nativeRelease(JNIEnv* env, jobject thiz) {
     renderer.cleanup();
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jihoon_1mengine_MainActivity_nativeSetMeshType(JNIEnv* env, jobject thiz, jstring s) {
+    const char* cstr = env->GetStringUTFChars(s, nullptr); // Java string → C-style string
+    std::string str(cstr);                                // C-style string → std::string
+    env->ReleaseStringUTFChars(s, cstr);                  // 메모리 해제
+
+    renderer.getScene()->setGeometryToRenderObject(str);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jihoon_1mengine_MainActivity_nativeResetScene(JNIEnv* env, jobject thiz) {
+    renderer.resetScene();
 }

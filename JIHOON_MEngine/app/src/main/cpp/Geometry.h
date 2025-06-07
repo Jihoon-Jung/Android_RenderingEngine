@@ -16,16 +16,20 @@ struct Vertex
 class Geometry {
 public:
     Geometry() {};
-    ~Geometry() {};
+    ~Geometry();
 
-    void CreateCube_Geometry();
+    void createSphere_Geometry();
+    void createCube_Geometry();
+    void createPyramid_Geometry();
+    void createDefaultPlane(int sizeX, int sizeZ);
+    unsigned int getVBO();
+    unsigned int getVAO();
+    unsigned int getEBO();
 
-    unsigned int GetVBO();
-    unsigned int GetVAO();
-    unsigned int GetEBO();
-
+    int getIndexCount() { return _indexCount; }
 private:
     unsigned int VBO, VAO, EBO;
+    int _indexCount = 0;
 };
 
 

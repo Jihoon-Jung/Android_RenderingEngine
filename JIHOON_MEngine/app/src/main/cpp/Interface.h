@@ -51,4 +51,38 @@
 
 
 using namespace std;
+
+inline const char* GlErrorToString(GLenum err) {
+    switch (err) {
+        case GL_NO_ERROR:          return "GL_NO_ERROR";
+        case GL_INVALID_ENUM:      return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE:     return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+        case GL_OUT_OF_MEMORY:     return "GL_OUT_OF_MEMORY";
+        case GL_INVALID_FRAMEBUFFER_OPERATION: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+        default:                   return "UNKNOWN_GL_ERROR";
+    }
+}
+
+/*
+ < 에러 체크 사용 가능한 gl함수들 >
+- 셰이더/프로그램 관련
+    glCreateShader, glShaderSource, glCompileShader, glCreateProgram, glAttachShader, glLinkProgram, glUseProgram
+- 버퍼/VAO/VBO/EBO 관련
+    glGenBuffers, glBindBuffer, glBufferData, glGenVertexArrays, glBindVertexArray, glVertexAttribPointer, glEnableVertexAttribArray
+- 텍스처 관련
+    glGenTextures, glBindTexture, glTexImage2D, glTexParameteri, glActiveTexture
+- 렌더링 관련
+    glClearColor, glClear, glDrawArrays, glDrawElements
+- 기타
+    glViewport, glEnable, glDisable, glUniform*, glGetUniformLocation, glGetAttribLocation
+ */
+#define CHECK_GL_ERROR() \
+    { \
+        GLenum err = glGetError(); \
+        if (err != GL_NO_ERROR) { \
+            LOGE("[GL_ERROR] %s:%d (%s) - 0x%x (%s)", \
+                __FILE__, __LINE__, __func__, err, GlErrorToString(err)); \
+        } \
+    }
 #endif //JIHOON_MENGINE_INTERFACE_H
