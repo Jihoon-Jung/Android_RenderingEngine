@@ -14,6 +14,7 @@ public:
     void setGeometryToRenderObject(string meshType);
     void setTextureToRenderObject(int width, int height, void *pixelData);
     shared_ptr<RenderObject>& getRenderObject() { return _renderObject; }
+    shared_ptr<RenderObject>& getDefaultPlane() { return _defaultPlane; }
 private:
     shared_ptr<RenderObject> _renderObject;
     shared_ptr<RenderObject> _defaultPlane;

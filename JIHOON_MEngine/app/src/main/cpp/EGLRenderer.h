@@ -40,6 +40,7 @@ private:
     shared_ptr<Camera> _camera;
     shared_ptr<Scene> _scene;
 
+    Eigen::Vector3f _lightPos = {10.0f, 5.0f, 0.0f};
 };
 
 

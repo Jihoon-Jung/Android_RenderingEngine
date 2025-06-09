@@ -8,11 +8,12 @@ void Camera::initialize(int width, int height) {
     LOGI("Camera initialize");
     _surfaceWidth = width;
     _surfaceHeight = height;
+    _transform = make_shared<Transform>();
 }
 
 void Camera::Update() {
     // View: simple translation (camera back from origin)
-    Eigen::Vector3f eye(0.0f, 0.0f, 3.0f);
+    Eigen::Vector3f eye(_transform->getPosition() /*0.0f, -3.0f, 7.0f*/);
     Eigen::Vector3f at(0.0f, 0.0f, 0.0f);
     Eigen::Vector3f up(0.0f, 1.0f, 0.0f);
 

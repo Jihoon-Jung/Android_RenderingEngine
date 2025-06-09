@@ -6,40 +6,40 @@
 void Geometry::createCube_Geometry() {
     std::vector<Vertex> cubeVertices = {
             // 뒤쪽 face (Z-)
-            {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}}, // 0
-            {{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // 1
-            {{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f}}, // 2
-            {{-0.5f,  0.5f, -0.5f}, {1.0f, 0.0f}}, // 3
+            {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 0
+            {{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}}, // 1
+            {{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, // 2
+            {{-0.5f,  0.5f, -0.5f}, {1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}}, // 3
 
             // 앞쪽 face (Z+)
-            {{-0.5f, -0.5f,  0.5f}, {0.0f, 1.0f}}, // 4
-            {{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f}}, // 5
-            {{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}}, // 6
-            {{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}}, // 7
+            {{-0.5f, -0.5f,  0.5f}, {0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 4
+            {{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}}, // 5
+            {{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}, // 6
+            {{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}, // 7
 
             // 위쪽 face (Y+)
-            {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // 8 (3)
-            {{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // 9 (2)
-            {{ 0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}}, // 10 (6)
-            {{-0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}}, // 11 (7)
+            {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}}, // 8 (3)
+            {{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}}, // 9 (2)
+            {{ 0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}, // 10 (6)
+            {{-0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}, // 11 (7)
 
             // 아래쪽 face (Y-)
-            {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // 12 (0)
-            {{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // 13 (1)
-            {{ 0.5f, -0.5f,  0.5f}, {0.0f, 1.0f}}, // 14 (5)
-            {{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f}}, // 15 (4)
+            {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // 12 (0)
+            {{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // 13 (1)
+            {{ 0.5f, -0.5f,  0.5f}, {0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 14 (5)
+            {{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 15 (4)
 
             // 오른쪽 face (X+)
-            {{ 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}}, // 16 (1)
-            {{ 0.5f,  0.5f, -0.5f}, {1.0f, 0.0f}}, // 17 (2)
-            {{ 0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}}, // 18 (6)
-            {{ 0.5f, -0.5f,  0.5f}, {0.0f, 1.0f}}, // 19 (5)
+            {{ 0.5f, -0.5f, -0.5f}, {1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}}, // 16 (1)
+            {{ 0.5f,  0.5f, -0.5f}, {1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}, // 17 (2)
+            {{ 0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}, // 18 (6)
+            {{ 0.5f, -0.5f,  0.5f}, {0.0f, 1.0f}, {1.0f, 0.0f, 0.0f}}, // 19 (5)
 
             // 왼쪽 face (X-)
-            {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}}, // 20 (0)
-            {{-0.5f,  0.5f, -0.5f}, {0.0f, 0.0f}}, // 21 (3)
-            {{-0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}}, // 22 (7)
-            {{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f}}  // 23 (4)
+            {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}}, // 20 (0)
+            {{-0.5f,  0.5f, -0.5f}, {0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, // 21 (3)
+            {{-0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}}, // 22 (7)
+            {{-0.5f, -0.5f,  0.5f}, {1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}}  // 23 (4)
     };
 
     std::vector<unsigned int> indices = {
@@ -66,6 +66,9 @@ void Geometry::createCube_Geometry() {
         vertexBuffer.push_back(v.position.z());
         vertexBuffer.push_back(v.uv.x());
         vertexBuffer.push_back(v.uv.y());
+        vertexBuffer.push_back(v.normal.x());
+        vertexBuffer.push_back(v.normal.y());
+        vertexBuffer.push_back(v.normal.z());
     }
 
     glGenVertexArrays(1, &VAO);
@@ -79,12 +82,14 @@ void Geometry::createCube_Geometry() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);              // position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);              // position
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float)*3));  // uv
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float)*3));  // uv
     glEnableVertexAttribArray(1);
 
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float)*5));  // normal
+    glEnableVertexAttribArray(2);
 
     // 바인딩 해제 (안전을 위해)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -114,7 +119,10 @@ void Geometry::createSphere_Geometry() {
             float u = (float)j / sectorCount;
             float v = 1.0f - (float)i / stackCount; // y축 뒤집기(텍스처 정상)
 
-            vertices.push_back({Eigen::Vector3f(x, y, z), Eigen::Vector2f(u, v)});
+            // 구체의 normal은 정규화된 위치 벡터와 동일
+            Eigen::Vector3f normal(x, y, z);
+            normal.normalize();
+            vertices.push_back({Eigen::Vector3f(x, y, z), Eigen::Vector2f(u, v), normal});
         }
     }
 
@@ -148,6 +156,9 @@ void Geometry::createSphere_Geometry() {
         vertexBuffer.push_back(v.position.z());
         vertexBuffer.push_back(v.uv.x());
         vertexBuffer.push_back(v.uv.y());
+        vertexBuffer.push_back(v.normal.x());
+        vertexBuffer.push_back(v.normal.y());
+        vertexBuffer.push_back(v.normal.z());
     }
 
     glGenVertexArrays(1, &VAO);
@@ -161,11 +172,14 @@ void Geometry::createSphere_Geometry() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float)*3));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float)*3));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float)*5));
+    glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -174,13 +188,30 @@ void Geometry::createSphere_Geometry() {
 void Geometry::createPyramid_Geometry() {
     std::vector<Vertex> vertices = {
             // 바닥 (정사각형)
-            {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // 0
-            {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // 1
-            {{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f}}, // 2
-            {{-0.5f, -0.5f,  0.5f}, {0.0f, 1.0f}}, // 3
+            {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // 0
+            {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}, // 1
+            {{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 2
+            {{-0.5f, -0.5f,  0.5f}, {0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}}, // 3
             // 꼭짓점
-            {{ 0.0f,  0.5f,  0.0f}, {0.5f, 0.5f}}  // 4
+            {{ 0.0f,  0.5f,  0.0f}, {0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}  // 4
     };
+
+    // 옆면의 normal 계산
+    std::vector<Eigen::Vector3f> sideNormals;
+    // 앞면 normal
+    Eigen::Vector3f frontNormal = Eigen::Vector3f(0.0f, 0.5f, 0.5f).normalized();
+    // 오른쪽면 normal
+    Eigen::Vector3f rightNormal = Eigen::Vector3f(0.5f, 0.5f, 0.0f).normalized();
+    // 뒷면 normal
+    Eigen::Vector3f backNormal = Eigen::Vector3f(0.0f, 0.5f, -0.5f).normalized();
+    // 왼쪽면 normal
+    Eigen::Vector3f leftNormal = Eigen::Vector3f(-0.5f, 0.5f, 0.0f).normalized();
+
+    // 옆면 정점들의 normal 업데이트
+    vertices[0].normal = (backNormal + leftNormal).normalized();  // 왼쪽 뒷모서리
+    vertices[1].normal = (backNormal + rightNormal).normalized(); // 오른쪽 뒷모서리
+    vertices[2].normal = (frontNormal + rightNormal).normalized(); // 오른쪽 앞모서리
+    vertices[3].normal = (frontNormal + leftNormal).normalized();  // 왼쪽 앞모서리
 
     std::vector<unsigned int> indices = {
             // 바닥
@@ -201,6 +232,9 @@ void Geometry::createPyramid_Geometry() {
         vertexBuffer.push_back(v.position.z());
         vertexBuffer.push_back(v.uv.x());
         vertexBuffer.push_back(v.uv.y());
+        vertexBuffer.push_back(v.normal.x());
+        vertexBuffer.push_back(v.normal.y());
+        vertexBuffer.push_back(v.normal.z());
     }
 
     glGenVertexArrays(1, &VAO);
@@ -214,11 +248,14 @@ void Geometry::createPyramid_Geometry() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float)*3));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float)*3));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float)*5));
+    glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -251,6 +288,7 @@ void Geometry::createDefaultPlane(int sizeX, int sizeZ) {
             Vertex v;
             v.position = Eigen::Vector3f(static_cast<float>(x), 0, static_cast<float>(z));
             v.uv = Eigen::Vector2f(static_cast<float>(x), static_cast<float>(sizeZ - z));
+            v.normal = Eigen::Vector3f(0.0f, 1.0f, 0.0f); // 평면의 normal은 항상 위쪽 방향
             gridVertex.push_back(v);
         }
     }
@@ -285,25 +323,32 @@ void Geometry::createDefaultPlane(int sizeX, int sizeZ) {
         vertexBuffer.push_back(v.position.z());
         vertexBuffer.push_back(v.uv.x());
         vertexBuffer.push_back(v.uv.y());
+        vertexBuffer.push_back(v.normal.x());
+        vertexBuffer.push_back(v.normal.y());
+        vertexBuffer.push_back(v.normal.z());
     }
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    glGenVertexArrays(1, &VAO);  CHECK_GL_ERROR();
+    glGenBuffers(1, &VBO);      CHECK_GL_ERROR();
+    glGenBuffers(1, &EBO);      CHECK_GL_ERROR();
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertexBuffer.size() * sizeof(float), vertexBuffer.data(), GL_STATIC_DRAW);
+
+    glBindVertexArray(VAO);         CHECK_GL_ERROR();
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);                                                                                     CHECK_GL_ERROR();
+    glBufferData(GL_ARRAY_BUFFER, vertexBuffer.size() * sizeof(float), vertexBuffer.data(), GL_STATIC_DRAW);      CHECK_GL_ERROR();
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, idx.size() * sizeof(unsigned int), idx.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, idx.size() * sizeof(unsigned int), idx.data(), GL_STATIC_DRAW);           CHECK_GL_ERROR();
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
-    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);                   CHECK_GL_ERROR();
+    glEnableVertexAttribArray(0);      CHECK_GL_ERROR();
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
-    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 3));     CHECK_GL_ERROR();
+    glEnableVertexAttribArray(1);       CHECK_GL_ERROR();
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(sizeof(float) * 5));     CHECK_GL_ERROR();
+    glEnableVertexAttribArray(2);       CHECK_GL_ERROR();
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);   CHECK_GL_ERROR();
+    glBindVertexArray(0);   CHECK_GL_ERROR();
 }

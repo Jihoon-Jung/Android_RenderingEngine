@@ -79,3 +79,25 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_example_jihoon_1mengine_MainActivity_nativeResetScene(JNIEnv* env, jobject thiz) {
     renderer.resetScene();
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_jihoon_1mengine_MainActivity_nativeSetAssetImage(JNIEnv *env, jobject thiz, jobject bitmap) {
+    AndroidBitmapInfo info;
+    void* pixels = nullptr;
+
+    if (AndroidBitmap_getInfo(env, bitmap, &info) != ANDROID_BITMAP_RESULT_SUCCESS ||
+        info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
+        LOGE("Unsupported bitmap format");
+        return;
+    }
+
+    if (AndroidBitmap_lockPixels(env, bitmap, &pixels) != ANDROID_BITMAP_RESULT_SUCCESS) {
+        LOGE("Failed to lock pixels");
+        return;
+    }
+    renderer.getScene()->getDefaultPlane()->GetTexture()->setTextureData(info.width, info.height, pixels);
+    // 또는 원하는 Texture 인스턴스에 전달
+
+    AndroidBitmap_unlockPixels(env, bitmap);
+}

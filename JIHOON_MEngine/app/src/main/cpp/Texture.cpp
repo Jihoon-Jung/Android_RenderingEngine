@@ -1,7 +1,8 @@
 //
 // Created by jihoon jung on 2025. 6. 5..
 //
-
+#define STB_IMAGE_IMPLEMENTATION
+#include <../../../external/stb/stb_image.h>
 #include "Texture.h"
 
 void Texture::setTextureData(int width, int height, void* data)
@@ -10,7 +11,6 @@ void Texture::setTextureData(int width, int height, void* data)
     _imageData.assign((unsigned char*)data, (unsigned char*)data + width * height * 4);
     _width = width;
     _height = height;
-    _hasImage = true;
     createTexture();
 }
 
@@ -27,8 +27,8 @@ void Texture::createTexture() {
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         CHECK_GL_ERROR();
         LOGI("Texture::createTexture - glTexImage2D 호출 전 - 크기: %dx%d", _width, _height);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0,

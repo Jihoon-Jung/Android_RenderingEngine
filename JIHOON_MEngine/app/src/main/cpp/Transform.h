@@ -18,6 +18,9 @@ public:
     void SetScale(const Eigen::Vector3f& s) { _scale = s; }
 
     const Eigen::Matrix4f& GetModelMatrix() const { return _model; }
+
+    const Eigen::Vector3f& getPosition() const { return _position; }
+    const Eigen::Vector3f& getScale() const { return _scale; }
 private:
 
     Eigen::Vector3f _position = Eigen::Vector3f::Zero();

@@ -50,7 +50,8 @@ add_subdirectory(${ASSIMP_SOURCE_DIR} ${ASSIMP_BINARY_DIR})
 # 4. include 디렉토리 추가
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
         ${ASSIMP_SOURCE_DIR}/include
-        ${CMAKE_SOURCE_DIR}/../external/eigen)
+        ${CMAKE_SOURCE_DIR}/../external/eigen
+        ${CMAKE_SOURCE_DIR}/../external/stb)
 
 # Specifies libraries CMake should link to your target library. You
 # can link libraries from various origins, such as libraries defined in this

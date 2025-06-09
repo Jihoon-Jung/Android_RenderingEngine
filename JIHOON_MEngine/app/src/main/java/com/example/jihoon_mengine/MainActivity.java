@@ -3,7 +3,9 @@ package com.example.jihoon_mengine;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.jihoon_mengine.databinding.ActivityMainBinding;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
     static {
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonSelectMesh, buttonSelectTexture, buttonOk, buttonCancel;
     private String selectedMesh = null;
     private Bitmap selectedTexture = null;
-
+    private Bitmap assetBitmap = null;
     private final String[] meshList = {"Sphere", "Cube", "Pyramid"};
 
     private TextureView textureView;
@@ -56,8 +59,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
                 Surface s = new Surface(surface);
-                if (nativeInit(s))
+                if (nativeInit(s)) {
                     Choreographer.getInstance().postFrameCallback(frameCallback);
+                    loadTextureFromAssets("wood.jpg");
+                }
                 else
                     Log.e("JJH", "EGL Initialize Error");
             }
@@ -108,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
             checkOkButton();
             layoutMain.setVisibility(View.GONE);
             layoutSceneEdit.setVisibility(View.VISIBLE);
+            nativeSetAssetImage(assetBitmap); // JNI로 Bitmap 전달
         });
 
         // Scene 생성 화면 UI
@@ -184,6 +190,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void loadTextureFromAssets(String assetName) {
+        try {
+            AssetManager assetManager = getAssets();
+            InputStream is = assetManager.open(assetName);
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            is.close();
+            assetBitmap = bitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     // JNI 함수 선언
     private native boolean nativeInit(Surface surface);
     private native void nativeRelease();
@@ -193,4 +210,5 @@ public class MainActivity extends AppCompatActivity {
     private native void nativeSetImage(Bitmap bitmap);
     private native void nativeSetMeshType(String meshType);
     private native void nativeResetScene();
+    private native void nativeSetAssetImage(Bitmap bitmap);
 }

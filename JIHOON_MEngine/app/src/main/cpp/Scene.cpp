@@ -7,6 +7,7 @@
 Scene::Scene() {
     _renderObject = make_shared<RenderObject>();
     _defaultPlane = make_shared<RenderObject>();
+    _defaultPlane->setMesh("DefaultPlane");
 }
 
 Scene::~Scene() {

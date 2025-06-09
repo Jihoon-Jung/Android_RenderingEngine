@@ -6,6 +6,7 @@
 #define JIHOON_MENGINE_CAMERA_H
 
 #include "Interface.h"
+#include "Transform.h"
 
 class Camera {
 public:
@@ -17,7 +18,9 @@ public:
     void setViewportSize(int width, int height);
 
     Eigen::Matrix4f GetProjectionViewMat() const { return _proj * _view; }
-
+    Eigen::Matrix4f getViewMat() const { return _view; }
+    Eigen::Matrix4f getProjMat() const { return _proj; }
+    shared_ptr<Transform>& getTransform() { return _transform; }
 private:
 
     int _surfaceWidth;
@@ -25,6 +28,8 @@ private:
 
     Eigen::Matrix4f _view = Eigen::Matrix4f::Identity();
     Eigen::Matrix4f _proj = Eigen::Matrix4f::Identity();
+
+    shared_ptr<Transform> _transform;
 };
 
 

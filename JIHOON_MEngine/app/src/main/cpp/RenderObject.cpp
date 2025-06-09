@@ -16,7 +16,6 @@ RenderObject::~RenderObject() {
     _transform.reset();
     _geometry.reset();
     _texture.reset();
-    _geometry.reset();
 }
 
 void RenderObject::Update() {
@@ -39,7 +38,8 @@ void RenderObject::setMesh(std::string meshType) {
     } else if (meshType == "Pyramid") {
         LOGI("RenderObject->meshType = Pyramid");
         _geometry->createPyramid_Geometry();
-    } else {
-        // default 처리
+    } else  if (meshType == "DefaultPlane"){
+        LOGI("RenderObject->meshType = DefaultPlane");
+        _geometry->createDefaultPlane(20, 20);
     }
 }

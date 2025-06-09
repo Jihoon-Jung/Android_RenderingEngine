@@ -10,6 +10,7 @@ struct Vertex
 {
     Eigen::Vector3f position;
     Eigen::Vector2f uv;
+    Eigen::Vector3f normal;
 };
 
 

@@ -83,7 +83,7 @@ bool EGLRenderer::initialize(EGLNativeWindowType window) {
 
     _camera = make_shared<Camera>();
     _camera->initialize(ANativeWindow_getWidth(window),ANativeWindow_getHeight(window));
-
+    _camera->getTransform()->SetPosition(Eigen::Vector3f (0.0f, -3.0f, 7.0f));
     _scene =  make_shared<Scene>();
 
     return true;
@@ -119,15 +119,13 @@ void EGLRenderer::renderFrame() {
 
     unsigned int textureId = 0;
     shared_ptr<RenderObject> renderObj = _scene->getRenderObject();
-    shared_ptr<Texture> texture = _scene->getRenderObject()->GetTexture();
+    shared_ptr<Texture> texture = renderObj->GetTexture();
 
-    textureId = _scene->getRenderObject()->GetTexture()->getTextureId();
+    textureId = renderObj->GetTexture()->getTextureId();
     if (textureId == 0) {
         return;
     }
-
     _camera->Update();
-    renderObj = _scene->getRenderObject();
     renderObj->Update();
 
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -136,13 +134,20 @@ void EGLRenderer::renderFrame() {
     CHECK_GL_ERROR();
     unsigned int shaderProgram = shaders->GetShaderProgram("SimpleRed");
 
-    Eigen::Matrix4f mvp = _camera->GetProjectionViewMat() * renderObj->GetTransform()->GetModelMatrix();
-
     glUseProgram(shaderProgram);
     CHECK_GL_ERROR();
-    // 1. uMVP 설정
-    GLint mvpLoc = glGetUniformLocation(shaderProgram, "uMVP");
-    glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, mvp.data());
+
+
+    GLint modelLoc = glGetUniformLocation(shaderProgram, "uModel");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, renderObj->GetTransform()->GetModelMatrix().data());
+    CHECK_GL_ERROR();
+
+    GLint viewLoc = glGetUniformLocation(shaderProgram, "uView");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, _camera->getViewMat().data());
+    CHECK_GL_ERROR();
+
+    GLint projLoc = glGetUniformLocation(shaderProgram, "uProj");
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, _camera->getProjMat().data());
     CHECK_GL_ERROR();
 
     // 텍스처 바인딩
@@ -157,11 +162,85 @@ void EGLRenderer::renderFrame() {
     glUniform1i(texLoc, 0);
     CHECK_GL_ERROR();
 
+    Eigen::Vector3f cameraPos = _camera->getTransform()->getPosition();
+    GLint viewPosLoc = glGetUniformLocation(shaderProgram, "uViewPos");
+    glUniform3f(viewPosLoc, cameraPos.x(), cameraPos.y(), cameraPos.z());
+    CHECK_GL_ERROR();
+
+    GLint lightPosLoc = glGetUniformLocation(shaderProgram, "uLightPos");
+    glUniform3f(lightPosLoc, _lightPos.x(), _lightPos.y(), _lightPos.z());
+    CHECK_GL_ERROR();
+
     // 5. 정점 배열 및 드로우 호출
     glBindVertexArray(renderObj->GetGeometry()->getVAO());
     CHECK_GL_ERROR();
     glDrawElements(GL_TRIANGLES, renderObj->GetGeometry()->getIndexCount(), GL_UNSIGNED_INT, 0);
     CHECK_GL_ERROR();
+
+
+
+    {
+        unsigned int textureId = 0;
+        shared_ptr<RenderObject> renderObj = _scene->getDefaultPlane();
+        if (!renderObj)
+            return;
+        shared_ptr<Texture> texture = renderObj->GetTexture();
+
+        textureId = renderObj->GetTexture()->getTextureId();
+        LOGE("Default plane texture : %d", textureId);
+        if (textureId == 0) {
+            return;
+        }
+        renderObj->GetTransform()->SetPosition(Eigen::Vector3f (-10.0f, -1.0f, -10.0f));
+        renderObj->Update();
+
+        CHECK_GL_ERROR();
+        unsigned int shaderProgram = shaders->GetShaderProgram("SimpleRed");
+
+        glUseProgram(shaderProgram);
+        CHECK_GL_ERROR();
+
+        GLint modelLoc = glGetUniformLocation(shaderProgram, "uModel");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, renderObj->GetTransform()->GetModelMatrix().data());
+        CHECK_GL_ERROR();
+
+        GLint viewLoc = glGetUniformLocation(shaderProgram, "uView");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, _camera->getViewMat().data());
+        CHECK_GL_ERROR();
+
+        GLint projLoc = glGetUniformLocation(shaderProgram, "uProj");
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, _camera->getProjMat().data());
+        CHECK_GL_ERROR();
+
+        // 텍스처 바인딩
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        CHECK_GL_ERROR();
+
+        GLint texLoc = glGetUniformLocation(shaderProgram, "uTexture");
+        if (texLoc == -1) {
+            LOGE("Failed to get uniform location for uTexture");
+        }
+        glUniform1i(texLoc, 0);
+        CHECK_GL_ERROR();
+
+        Eigen::Vector3f cameraPos = _camera->getTransform()->getPosition();
+        GLint viewPosLoc = glGetUniformLocation(shaderProgram, "uViewPos");
+        glUniform3f(viewPosLoc, cameraPos.x(), cameraPos.y(), cameraPos.z());
+        CHECK_GL_ERROR();
+
+        GLint lightPosLoc = glGetUniformLocation(shaderProgram, "uLightPos");
+        glUniform3f(lightPosLoc, _lightPos.x(), _lightPos.y(), _lightPos.z());
+        CHECK_GL_ERROR();
+
+        // 5. 정점 배열 및 드로우 호출
+        glBindVertexArray(renderObj->GetGeometry()->getVAO());
+        CHECK_GL_ERROR();
+        glDrawElements(GL_TRIANGLES, renderObj->GetGeometry()->getIndexCount(), GL_UNSIGNED_INT, 0);
+        CHECK_GL_ERROR();
+
+    }
+
 
     if (!eglSwapBuffers(_display, _surface)) {
         LOGE("eglSwapBuffers failed: 0x%x", eglGetError());
