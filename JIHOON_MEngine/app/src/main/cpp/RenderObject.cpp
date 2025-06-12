@@ -19,8 +19,6 @@ RenderObject::~RenderObject() {
 }
 
 void RenderObject::Update() {
-    _transform->Update();
-
 }
 
 void RenderObject::setTextureData(int width, int height, void *data) {

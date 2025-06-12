@@ -11,6 +11,8 @@
 #include "RenderObject.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "Light.h"
+#include "FirstPersonController.h"
 
 class EGLRenderer {
 public:
@@ -19,10 +21,24 @@ public:
 
     bool initialize(EGLNativeWindowType window);
     void renderFrame();
+    void makeShadowMapTexture();
     void cleanup();
     void setViewportSize(int width, int height);
+
     void onTouchDelta(float dx, float dy);
+    void onTwoFingerTouchDelta(float dx, float dy);
+    void onJoystickMoved(float x, float y);
+    void onToggleChanged(bool isOn);
+
     void resetScene();
+    void renderScene();
+    void drawLight(shared_ptr<Light> renderObj, string shaderName);
+    void drawTmp(shared_ptr<RenderObject> renderObj, string shaderName, bool isDrawShadowMap);
+    void drawRenderObject(shared_ptr<RenderObject> renderObj, string shaderName, bool isDrawShadowMap = false);
+    void drawShadowMap(shared_ptr<RenderObject> renderObj, shared_ptr<RenderObject> defaultPlane);
+    void DebugShadowMap();
+    void resetViewport();
+
     shared_ptr<Scene>& getScene() { return _scene; }
 private:
     EGLDisplay _display; // OpenglES 명령을 보낼 수 있는 "물리적 출력 장치"에 대한 핸들, HDMI포트 같은 느낌이다.
@@ -33,14 +49,22 @@ private:
     // 한 쓰레드당 하나의 context만 current 상태가 될 수 있음
 
 
+    unsigned int _shadowMapFBO;
+    unsigned int _shadowMap;
     int _surfaceWidth;
     int _surfaceHeight;
 
     shared_ptr<Shaders> shaders;
     shared_ptr<Camera> _camera;
+    unique_ptr<FirstPersonController> _fpsCtrl;
     shared_ptr<Scene> _scene;
+    shared_ptr<Light> _light;
+    shared_ptr<RenderObject> _tmp;
 
-    Eigen::Vector3f _lightPos = {10.0f, 5.0f, 0.0f};
+    unsigned int debug_VAO = 0;
+    unsigned int debug_VBO = 0;
+
+    bool _isToggleOn = false;
 };
 
 

@@ -7,6 +7,7 @@
 
 #include "Interface.h"
 #include "Transform.h"
+#include "SimpleMath.h"
 
 class Camera {
 public:
@@ -18,8 +19,8 @@ public:
     void setViewportSize(int width, int height);
 
     Eigen::Matrix4f GetProjectionViewMat() const { return _proj * _view; }
-    Eigen::Matrix4f getViewMat() const { return _view; }
-    Eigen::Matrix4f getProjMat() const { return _proj; }
+    const Eigen::Matrix4f& getViewMat() const { return _view; }
+    const Eigen::Matrix4f& getProjMat() const { return _proj; }
     shared_ptr<Transform>& getTransform() { return _transform; }
 private:
 

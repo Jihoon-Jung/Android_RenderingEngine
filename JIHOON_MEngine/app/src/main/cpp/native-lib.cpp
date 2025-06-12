@@ -101,3 +101,20 @@ Java_com_example_jihoon_1mengine_MainActivity_nativeSetAssetImage(JNIEnv *env, j
 
     AndroidBitmap_unlockPixels(env, bitmap);
 }
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_jihoon_1mengine_MainActivity_nativeOnJoystickMoved(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
+    renderer.onJoystickMoved(x, y);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_jihoon_1mengine_MainActivity_nativeOnTwoFingerTouchDelta(JNIEnv *env, jobject thiz, jfloat dx, jfloat dy) {
+    renderer.onTwoFingerTouchDelta(dx, dy);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_jihoon_1mengine_MainActivity_nativeOnToggleChanged(
+        JNIEnv *env, jobject thiz, jboolean is_on) {
+    renderer.onToggleChanged(is_on);
+}

@@ -49,6 +49,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#define SHADOW_WIDTH 1024
+#define SHADOW_HEIGHT 1024
 
 using namespace std;
 

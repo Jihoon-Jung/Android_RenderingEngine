@@ -45,6 +45,17 @@ public class MainActivity extends AppCompatActivity {
     private final String[] meshList = {"Sphere", "Cube", "Pyramid"};
 
     private TextureView textureView;
+    private JoystickView joystickView;
+
+
+    private float prevX1 = 0, prevY1 = 0;  // 첫 번째 손가락
+    private float prevX2 = 0, prevY2 = 0;  // 두 번째 손가락
+    private boolean isTwoFingerTouch = false;
+    private float twoFingerStartX = 0, twoFingerStartY = 0;  // 두 손가락 터치 시작점
+    private boolean isFirstMove = true;  // 두 손가락 터치 후 첫 움직임인지 확인
+    private boolean isHorizontalMove = false;  // true면 수평 이동, false면 수직 이동
+
+    private boolean isToggleOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,19 +93,82 @@ public class MainActivity extends AppCompatActivity {
             public void onSurfaceTextureUpdated(SurfaceTexture surface) {}
         });
 
+        // 조이스틱 설정
+        joystickView = findViewById(R.id.joystickView);
+        joystickView.setOnJoystickMovedListener((x, y) -> {
+            // 조이스틱 이벤트를 네이티브 코드로 전달
+            nativeOnJoystickMoved(x, y);
+        });
+
         textureView.setOnTouchListener(new View.OnTouchListener() {
             float prevX = 0, prevY = 0;
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                float x = event.getX();
-                float y = event.getY();
-                switch (event.getAction()) {
+                switch (event.getActionMasked()) {
                     case MotionEvent.ACTION_DOWN:
-                        prevX = x; prevY = y; break;
+                        // 첫 번째 손가락 터치
+                        prevX1 = event.getX();
+                        prevY1 = event.getY();
+                        isTwoFingerTouch = false;
+                        isFirstMove = true;  // 터치 시작할 때 초기화
+                        break;
+
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        // 두 번째 손가락 터치
+                        if (event.getPointerCount() == 2) {
+                            isTwoFingerTouch = true;
+                            isFirstMove = true;  // 두 손가락 터치 시작할 때 초기화
+                            prevX1 = event.getX(0);
+                            prevY1 = event.getY(0);
+                            prevX2 = event.getX(1);
+                            prevY2 = event.getY(1);
+                            twoFingerStartX = (prevX1 + prevX2) / 2;
+                            twoFingerStartY = (prevY1 + prevY2) / 2;
+                        }
+                        break;
+
                     case MotionEvent.ACTION_MOVE:
-                        float dx = x - prevX, dy = y - prevY;
-                        nativeOnTouchDelta(dx, dy);
-                        prevX = x; prevY = y; break;
+                        if (isTwoFingerTouch && event.getPointerCount() == 2) {
+                            float currentX = (event.getX(0) + event.getX(1)) / 2;
+                            float currentY = (event.getY(0) + event.getY(1)) / 2;
+
+                            float dx = currentX - twoFingerStartX;
+                            float dy = currentY - twoFingerStartY;
+
+                            if (isFirstMove) {
+                                // 첫 움직임일 때만 방향 결정
+                                isHorizontalMove = Math.abs(dx) > Math.abs(dy);
+                                isFirstMove = false;
+                            }
+
+                            // 결정된 방향으로만 회전
+                            if (isHorizontalMove) {
+                                nativeOnTwoFingerTouchDelta(dx, 0);
+                            } else {
+                                nativeOnTwoFingerTouchDelta(0, dy);
+                            }
+
+                            twoFingerStartX = currentX;
+                            twoFingerStartY = currentY;
+                        } else if (!isTwoFingerTouch) {
+                            // 기존의 단일 터치 회전 처리
+                            float x = event.getX();
+                            float y = event.getY();
+                            float dx = x - prevX1;
+                            float dy = y - prevY1;
+                            nativeOnTouchDelta(dx, dy);
+                            prevX1 = x;
+                            prevY1 = y;
+                        }
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_POINTER_UP:
+                        if (event.getPointerCount() <= 1) {
+                            isTwoFingerTouch = false;
+                            isFirstMove = true;  // 터치가 끝날 때 초기화
+                        }
+                        break;
                 }
                 return true;
             }
@@ -148,6 +222,13 @@ public class MainActivity extends AppCompatActivity {
         buttonCancel.setOnClickListener(v -> {
             layoutSceneEdit.setVisibility(View.GONE);
             layoutMain.setVisibility(View.VISIBLE);
+        });
+
+        Button buttonToggle = findViewById(R.id.buttonToggle);
+        buttonToggle.setOnClickListener(v -> {
+            isToggleOn = !isToggleOn;  // 상태 토글
+            nativeOnToggleChanged(isToggleOn);  // C++에 상태 전달
+            buttonToggle.setText(isToggleOn ? "ON" : "OFF");  // 버튼 텍스트 업데이트
         });
     }
 
@@ -211,4 +292,7 @@ public class MainActivity extends AppCompatActivity {
     private native void nativeSetMeshType(String meshType);
     private native void nativeResetScene();
     private native void nativeSetAssetImage(Bitmap bitmap);
+    private native void nativeOnJoystickMoved(float x, float y);
+    private native void nativeOnTwoFingerTouchDelta(float dx, float dy);
+    private native void nativeOnToggleChanged(boolean isOn);
 }
