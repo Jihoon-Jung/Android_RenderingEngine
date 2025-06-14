@@ -93,8 +93,8 @@ bool EGLRenderer::initialize(EGLNativeWindowType window) {
     _camera->getTransform()->RotateByEulerDelta(-10.0f, 0.0f);
     _fpsCtrl = std::make_unique<FirstPersonController>(_camera);
     _light = make_shared<Light>();
-    _light->getTransform()->SetPosition(Eigen::Vector3f (0.0f, 3.0f, 7.0f));
-    _light->getTransform()->RotateByEulerDelta(30.0f, 0.0f);
+    _light->getTransform()->SetPosition(Eigen::Vector3f (0.0f, 3.0f, 3.0f));
+    _light->getTransform()->RotateByEulerDelta(-30.0f, -30.0f);
 
     makeShadowMapTexture();
 
@@ -187,6 +187,7 @@ void EGLRenderer::renderScene() {
 
     defaultPlane->GetTransform()->SetPosition(Eigen::Vector3f (-10.0f, -0.5f, -10.0f));
     _tmp->GetTransform()->RotateByEulerDelta(0.0f, 1.0f);
+    //_camera->getTransform()->RotateByEulerDelta(0.0f, 1.0f);
     _light->Update();
     _camera->Update();
     _fpsCtrl->Update(0.01f);
@@ -203,7 +204,7 @@ void EGLRenderer::renderScene() {
     drawRenderObject(renderObj, "DefaultShader");
     drawRenderObject(defaultPlane, "DefaultShader");
     drawTmp(_tmp, "SimpleWhiteShader",false);
-    drawLight(_light,"SimpleWhiteShader");
+//    drawLight(_light,"SimpleWhiteShader");
 
     if (!eglSwapBuffers(_display, _surface)) {
         LOGE("eglSwapBuffers failed: 0x%x", eglGetError());

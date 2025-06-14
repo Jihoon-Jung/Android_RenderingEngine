@@ -23,10 +23,10 @@ void Light::Update() {
     Eigen::Vector3f yaxis = zaxis.cross(xaxis);
 
     _lightViewMat <<
-          xaxis.x(), yaxis.x(), zaxis.x(), -xaxis.dot(eye),
-            xaxis.y(), yaxis.y(), zaxis.y(), -yaxis.dot(eye),
-            xaxis.z(), yaxis.z(), zaxis.z(), -zaxis.dot(eye),
-            0,         0,         0,         1;
+            xaxis.x(), xaxis.y(), xaxis.z(), -xaxis.dot(eye),
+            yaxis.x(), yaxis.y(), yaxis.z(), -yaxis.dot(eye),
+            zaxis.x(), zaxis.y(), zaxis.z(), -zaxis.dot(eye),
+            0,         0,         0,          1;
 
 
     const float l = -10.0f, r = 10.0f;
