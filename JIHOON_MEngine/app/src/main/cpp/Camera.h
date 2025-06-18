@@ -1,13 +1,10 @@
-//
-// Created by jihoon jung on 2025. 6. 5..
-//
-
 #ifndef JIHOON_MENGINE_CAMERA_H
 #define JIHOON_MENGINE_CAMERA_H
 
 #include "Interface.h"
 #include "Transform.h"
 #include "SimpleMath.h"
+
 
 class Camera {
 public:
@@ -18,22 +15,19 @@ public:
     void Update();
     void setViewportSize(int width, int height);
 
-    Eigen::Matrix4f GetProjectionViewMat() const { return _proj * _view; }
-    const Eigen::Matrix4f& getViewMat() const { return _view; }
-    const Eigen::Matrix4f& getProjMat() const { return _proj; }
+    glm::mat4 GetProjectionViewMat() const { return _proj * _view; }
+    const glm::mat4& getViewMat() const { return _view; }
+    const glm::mat4& getProjMat() const { return _proj; }
     shared_ptr<Transform>& getTransform() { return _transform; }
-private:
 
+private:
     int _surfaceWidth;
     int _surfaceHeight;
 
-    Eigen::Matrix4f _view = Eigen::Matrix4f::Identity();
-    Eigen::Matrix4f _proj = Eigen::Matrix4f::Identity();
+    glm::mat4 _view = glm::mat4(1.0f);
+    glm::mat4 _proj = glm::mat4(1.0f);
 
     shared_ptr<Transform> _transform;
 };
-
-
-
 
 #endif //JIHOON_MENGINE_CAMERA_H

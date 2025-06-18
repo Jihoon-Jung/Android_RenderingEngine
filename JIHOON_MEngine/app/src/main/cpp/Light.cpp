@@ -12,35 +12,35 @@ Light::Light() {
 
 void Light::Update() {
 
-    Eigen::Vector3f eye = _transform->getPosition();
-    Eigen::Vector3f look = _transform->getLook();     // Z- 방향
-    Eigen::Vector3f at = eye + look;
-    Eigen::Vector3f up = _transform->getUp();         // Y+ 방향
-
-    // 뷰 행렬 생성 (OpenGL RH 기준)
-    Eigen::Vector3f zaxis = (eye - at).normalized();
-    Eigen::Vector3f xaxis = up.cross(zaxis).normalized();
-    Eigen::Vector3f yaxis = zaxis.cross(xaxis);
-
-    _lightViewMat <<
-            xaxis.x(), xaxis.y(), xaxis.z(), -xaxis.dot(eye),
-            yaxis.x(), yaxis.y(), yaxis.z(), -yaxis.dot(eye),
-            zaxis.x(), zaxis.y(), zaxis.z(), -zaxis.dot(eye),
-            0,         0,         0,          1;
-
-
-    const float l = -10.0f, r = 10.0f;
-    const float b = -10.0f, t = 10.0f;
-    const float n = 1.0f,  f = 20.0f;
-
-    _lightProjMat.setZero();
-    _lightProjMat(0,0) =  2.0f / (r - l);
-    _lightProjMat(1,1) =  2.0f / (t - b);
-    _lightProjMat(2,2) = -2.0f / (f - n);
-    _lightProjMat(0,3) = -(r + l) / (r - l);
-    _lightProjMat(1,3) = -(t + b) / (t - b);
-    _lightProjMat(2,3) = -(f + n) / (f - n);
-    _lightProjMat(3,3) =  1.0f;
+//    Eigen::Vector3f eye = _transform->getPosition();
+//    Eigen::Vector3f look = _transform->getLook();     // Z- 방향
+//    Eigen::Vector3f at = eye + look;
+//    Eigen::Vector3f up = _transform->getUp();         // Y+ 방향
+//
+//    // 뷰 행렬 생성 (OpenGL RH 기준)
+//    Eigen::Vector3f zaxis = (eye - at).normalized();
+//    Eigen::Vector3f xaxis = up.cross(zaxis).normalized();
+//    Eigen::Vector3f yaxis = zaxis.cross(xaxis);
+//
+//    _lightViewMat <<
+//            xaxis.x(), xaxis.y(), xaxis.z(), -xaxis.dot(eye),
+//            yaxis.x(), yaxis.y(), yaxis.z(), -yaxis.dot(eye),
+//            zaxis.x(), zaxis.y(), zaxis.z(), -zaxis.dot(eye),
+//            0,         0,         0,          1;
+//
+//
+//    const float l = -10.0f, r = 10.0f;
+//    const float b = -10.0f, t = 10.0f;
+//    const float n = 1.0f,  f = 20.0f;
+//
+//    _lightProjMat.setZero();
+//    _lightProjMat(0,0) =  2.0f / (r - l);
+//    _lightProjMat(1,1) =  2.0f / (t - b);
+//    _lightProjMat(2,2) = -2.0f / (f - n);
+//    _lightProjMat(0,3) = -(r + l) / (r - l);
+//    _lightProjMat(1,3) = -(t + b) / (t - b);
+//    _lightProjMat(2,3) = -(f + n) / (f - n);
+//    _lightProjMat(3,3) =  1.0f;
 
 //    // Projection: perspective
 //    float aspect = (float)2960 / (float)1752;

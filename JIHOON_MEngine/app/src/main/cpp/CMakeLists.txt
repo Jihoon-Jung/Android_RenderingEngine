@@ -38,7 +38,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         Texture.cpp
         Scene.cpp
         Light.cpp
-        FirstPersonController.cpp)
+)
 
 # 1. Assimp 소스 디렉토리 지정
 set(ASSIMP_SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../external/assimp)
@@ -53,6 +53,7 @@ add_subdirectory(${ASSIMP_SOURCE_DIR} ${ASSIMP_BINARY_DIR})
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
         ${ASSIMP_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/../external/eigen
+        ${CMAKE_SOURCE_DIR}/../external/glm
         ${CMAKE_SOURCE_DIR}/../external/stb)
 
 # Specifies libraries CMake should link to your target library. You

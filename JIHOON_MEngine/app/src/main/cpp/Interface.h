@@ -49,6 +49,12 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+// glm
+#define GLM_ENABLE_EXPERIMENTAL
+#include <../../../external/glm/glm/glm.hpp>
+#include <../../../external/glm/glm/gtc/matrix_transform.hpp>
+#include <../../../external/glm/glm/gtx/quaternion.hpp>
+#include <../../../external/glm/glm/gtc/type_ptr.hpp>
 #define SHADOW_WIDTH 1024
 #define SHADOW_HEIGHT 1024
 

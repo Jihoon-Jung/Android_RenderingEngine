@@ -85,15 +85,14 @@ bool EGLRenderer::initialize(EGLNativeWindowType window) {
     _surfaceHeight = ANativeWindow_getHeight(window);
     _tmp = make_shared<RenderObject>();
     _tmp->GetGeometry()->createCube_Geometry();
-    _tmp->GetTransform()->SetPosition(Eigen::Vector3f (-3.0f, 0.0f, -2.0f));
+    _tmp->GetTransform()->SetPosition(glm::vec3 (-3.0f, 0.0f, -2.0f));
     _scene =  make_shared<Scene>();
     _camera = make_shared<Camera>();
     _camera->initialize(_surfaceWidth,_surfaceHeight);
-    _camera->getTransform()->SetPosition(Eigen::Vector3f (0.0f, 3.0f, 7.0f));
+    _camera->getTransform()->SetPosition(glm::vec3 (0.0f, 3.0f, 7.0f));
     _camera->getTransform()->RotateByEulerDelta(-10.0f, 0.0f);
-    _fpsCtrl = std::make_unique<FirstPersonController>(_camera);
     _light = make_shared<Light>();
-    _light->getTransform()->SetPosition(Eigen::Vector3f (0.0f, 3.0f, 3.0f));
+    _light->getTransform()->SetPosition(glm::vec3 (0.0f, 3.0f, 3.0f));
     _light->getTransform()->RotateByEulerDelta(-30.0f, -30.0f);
 
     makeShadowMapTexture();
@@ -184,13 +183,12 @@ void EGLRenderer::renderScene() {
 
     shared_ptr<RenderObject> renderObj = _scene->getRenderObject();
     shared_ptr<RenderObject> defaultPlane = _scene->getDefaultPlane();
-
-    defaultPlane->GetTransform()->SetPosition(Eigen::Vector3f (-10.0f, -0.5f, -10.0f));
+    renderObj->GetTransform()->SetPosition(glm::vec3(-10.0f, 0.0f, 0.0f));
+    defaultPlane->GetTransform()->SetPosition(glm::vec3 (-10.0f, -0.5f, -10.0f));
     _tmp->GetTransform()->RotateByEulerDelta(0.0f, 1.0f);
     //_camera->getTransform()->RotateByEulerDelta(0.0f, 1.0f);
     _light->Update();
     _camera->Update();
-    _fpsCtrl->Update(0.01f);
     drawShadowMap(renderObj, defaultPlane);
 
 
@@ -232,7 +230,8 @@ void EGLRenderer::drawRenderObject(shared_ptr<RenderObject> renderObj, string sh
 
 
     GLint modelLoc = glGetUniformLocation(shaderProgram, "uModel");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, renderObj->GetTransform()->GetModelMatrix().data());
+    const glm::mat4& model = renderObj->GetTransform()->getModelMatrix();
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     CHECK_GL_ERROR();
 
     GLint viewLoc = glGetUniformLocation(shaderProgram, "uView");
@@ -256,10 +255,8 @@ void EGLRenderer::drawRenderObject(shared_ptr<RenderObject> renderObj, string sh
             glUniformMatrix4fv(projLoc, 1, GL_FALSE, lightProj.data());
         }
         else {
-            glUniformMatrix4fv(viewLoc, 1, GL_FALSE,
-                               _camera->getViewMat().data());
-            glUniformMatrix4fv(projLoc, 1, GL_FALSE,
-                               _camera->getProjMat().data());
+            glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(_camera->getViewMat()));
+            glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(_camera->getProjMat()));
         }
     }
 
@@ -298,14 +295,14 @@ void EGLRenderer::drawRenderObject(shared_ptr<RenderObject> renderObj, string sh
     }
 
 
-    Eigen::Vector3f cameraPos = _camera->getTransform()->getPosition();
+    glm::vec3 cameraPos = _camera->getTransform()->getPosition();
     GLint viewPosLoc = glGetUniformLocation(shaderProgram, "uViewPos");
-    glUniform3f(viewPosLoc, cameraPos.x(), cameraPos.y(), cameraPos.z());
+    glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
     CHECK_GL_ERROR();
 
     GLint lightPosLoc = glGetUniformLocation(shaderProgram, "uLightPos");
-    glUniform3f(lightPosLoc, _light->getTransform()->getPosition().x(), _light->getTransform()->getPosition().y(),
-                _light->getTransform()->getPosition().z());
+    glUniform3f(lightPosLoc, _light->getTransform()->getPosition().x, _light->getTransform()->getPosition().y,
+                _light->getTransform()->getPosition().z);
     CHECK_GL_ERROR();
 
     // 5. 정점 배열 및 드로우 호출
@@ -337,11 +334,11 @@ void EGLRenderer::onJoystickMoved(float x, float y) {
 
     if (!_camera) return;
     shared_ptr<Transform> cameraTransform = _camera->getTransform();
-    float cameraPosX = cameraTransform->getPosition().x();
-    float cameraPosY = cameraTransform->getPosition().y();
+    float cameraPosX = cameraTransform->getPosition().x;
+    float cameraPosY = cameraTransform->getPosition().y;
     float newPosX = cameraPosX + x;
     float newPosY = cameraPosY - y;
-    _camera->getTransform()->SetPosition(Eigen::Vector3f (newPosX, newPosY, cameraTransform->getPosition().z()));
+    _camera->getTransform()->SetPosition(glm::vec3 (newPosX, newPosY, cameraTransform->getPosition().z));
 //    if (_fpsCtrl)
 //        _fpsCtrl->SetJoystick(x, -y);   // 필요하면 Y축 뒤집기
 }
@@ -367,7 +364,8 @@ void EGLRenderer::drawLight(shared_ptr<Light> renderObj, string shaderName) {
 
 
     GLint modelLoc = glGetUniformLocation(shaderProgram, "uModel");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, renderObj->GetTransform()->GetModelMatrix().data());
+    const glm::mat4& model = renderObj->GetTransform()->getModelMatrix();
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     CHECK_GL_ERROR();
 
     GLint viewLoc = glGetUniformLocation(shaderProgram, "uView");
@@ -383,10 +381,8 @@ void EGLRenderer::drawLight(shared_ptr<Light> renderObj, string shaderName) {
     }
     else
     {
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE,
-                           _camera->getViewMat().data());
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE,
-                           _camera->getProjMat().data());
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(_camera->getViewMat()));
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(_camera->getProjMat()));
     }
 
     CHECK_GL_ERROR();
@@ -406,7 +402,8 @@ void EGLRenderer::drawTmp(shared_ptr<RenderObject> renderObj, string shaderName,
 
 
     GLint modelLoc = glGetUniformLocation(shaderProgram, "uModel");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, renderObj->GetTransform()->GetModelMatrix().data());
+    const glm::mat4& model = renderObj->GetTransform()->getModelMatrix();
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     CHECK_GL_ERROR();
 
     GLint viewLoc = glGetUniformLocation(shaderProgram, "uView");
@@ -430,10 +427,8 @@ void EGLRenderer::drawTmp(shared_ptr<RenderObject> renderObj, string shaderName,
             glUniformMatrix4fv(projLoc, 1, GL_FALSE, lightProj.data());
         }
         else {
-            glUniformMatrix4fv(viewLoc, 1, GL_FALSE,
-                               _camera->getViewMat().data());
-            glUniformMatrix4fv(projLoc, 1, GL_FALSE,
-                               _camera->getProjMat().data());
+            glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(_camera->getViewMat()));
+            glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(_camera->getProjMat()));
         }
     }
     CHECK_GL_ERROR();
@@ -459,14 +454,14 @@ void EGLRenderer::drawTmp(shared_ptr<RenderObject> renderObj, string shaderName,
     }
 
 
-    Eigen::Vector3f cameraPos = _camera->getTransform()->getPosition();
+    glm::vec3 cameraPos = _camera->getTransform()->getPosition();
     GLint viewPosLoc = glGetUniformLocation(shaderProgram, "uViewPos");
-    glUniform3f(viewPosLoc, cameraPos.x(), cameraPos.y(), cameraPos.z());
+    glUniform3f(viewPosLoc, cameraPos.x, cameraPos.y, cameraPos.z);
     CHECK_GL_ERROR();
 
     GLint lightPosLoc = glGetUniformLocation(shaderProgram, "uLightPos");
-    glUniform3f(lightPosLoc, _light->getTransform()->getPosition().x(), _light->getTransform()->getPosition().y(),
-                _light->getTransform()->getPosition().z());
+    glUniform3f(lightPosLoc, _light->getTransform()->getPosition().x, _light->getTransform()->getPosition().y,
+                _light->getTransform()->getPosition().z);
     CHECK_GL_ERROR();
 
     // 5. 정점 배열 및 드로우 호출

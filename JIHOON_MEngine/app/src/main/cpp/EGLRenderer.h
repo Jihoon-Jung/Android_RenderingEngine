@@ -12,7 +12,6 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "Light.h"
-#include "FirstPersonController.h"
 
 class EGLRenderer {
 public:
@@ -56,7 +55,6 @@ private:
 
     shared_ptr<Shaders> shaders;
     shared_ptr<Camera> _camera;
-    unique_ptr<FirstPersonController> _fpsCtrl;
     shared_ptr<Scene> _scene;
     shared_ptr<Light> _light;
     shared_ptr<RenderObject> _tmp;
